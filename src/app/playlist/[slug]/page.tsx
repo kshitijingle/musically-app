@@ -1,3 +1,5 @@
+"use client"; // Added this line
+
 import { MainLayout } from "@/components/layout/main-layout";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { PlayCircle, Clock } from "lucide-react";

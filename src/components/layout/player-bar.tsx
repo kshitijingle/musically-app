@@ -6,8 +6,23 @@ import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { useMusicPlayer } from "@/context/music-player-context"; // Import the hook
 
+// Helper function to format time from seconds to MM:SS
+const formatTime = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  const formattedSeconds = remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
+  return `${minutes}:${formattedSeconds}`;
+};
+
 export function PlayerBar() {
-  const { currentSong, isPlaying, togglePlayPause } = useMusicPlayer();
+  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo } = useMusicPlayer();
+
+  const handleSliderChange = (value: number[]) => {
+    if (duration > 0) {
+      const newTime = (value[0] / 100) * duration;
+      seekTo(newTime);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between p-4 bg-card border-t border-border h-20">
@@ -54,9 +69,16 @@ export function PlayerBar() {
           </Button>
         </div>
         <div className="flex items-center w-full gap-2 text-xs text-muted-foreground">
-          <span>0:00</span>
-          <Progress value={currentSong ? 25 : 0} className="h-1 flex-grow" /> {/* Placeholder progress */}
-          <span>{currentSong?.duration || "0:00"}</span>
+          <span>{formatTime(currentTime)}</span>
+          <Slider
+            value={[duration > 0 ? (currentTime / duration) * 100 : 0]}
+            max={100}
+            step={0.1}
+            className="flex-grow"
+            onValueChange={handleSliderChange}
+            disabled={!currentSong}
+          />
+          <span>{formatTime(duration)}</span>
         </div>
       </div>
 

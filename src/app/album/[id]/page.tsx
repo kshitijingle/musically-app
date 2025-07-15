@@ -44,6 +44,7 @@ export default function AlbumPage({ params }: AlbumPageProps) {
         album: album.title,
         cover: album.cover,
         duration: firstSong.duration,
+        audioSrc: firstSong.audioSrc, // Pass audioSrc
       });
     }
   };
@@ -103,6 +104,7 @@ export default function AlbumPage({ params }: AlbumPageProps) {
                   album: album.title,
                   cover: album.cover,
                   duration: song.duration,
+                  audioSrc: song.audioSrc, // Pass audioSrc
                 })}>
                   <td className="py-3 px-4 text-sm">{i + 1}</td>
                   <td className="py-3 px-4">

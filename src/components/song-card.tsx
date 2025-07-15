@@ -13,6 +13,7 @@ interface SongCardProps {
     album: string;
     cover: string;
     duration: string;
+    audioSrc: string; // Added audioSrc
   };
 }
 

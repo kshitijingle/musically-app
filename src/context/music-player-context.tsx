@@ -37,7 +37,7 @@ interface MusicPlayerContextType {
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
 
-export function MusicPlayerProvider({ children }: { children: ReactNode }) { // Corrected this line
+export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -50,59 +50,14 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) { // 
   const [shuffleMode, setShuffleMode] = useState(false); // New
   const [repeatMode, setRepeatMode] = useState<'off' | 'song' | 'queue'>('off'); // New
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-
-      audioRef.current.onended = () => {
-        if (repeatMode === 'song' && currentSong) {
-          playSong(currentSong, queue, queueIndex); // Replay current song
-        } else {
-          playNextSong(); // Use the new playNextSong logic
-        }
-      };
-
-      audioRef.current.ontimeupdate = () => {
-        setCurrentTime(audioRef.current?.currentTime || 0);
-      };
-
-      audioRef.current.onloadedmetadata = () => {
-        setDuration(audioRef.current?.duration || 0);
-      };
-
-      audioRef.current.onerror = () => {
-        const audio = audioRef.current;
-        let errorMessage = "An unknown audio error occurred.";
-
-        if (audio && audio.error) {
-          console.error("Audio playback error:", audio.error);
-          switch (audio.error.code) {
-            case MediaError.MEDIA_ERR_ABORTED:
-              errorMessage = "Audio playback aborted by the user.";
-              break;
-            case MediaError.MEDIA_ERR_NETWORK:
-              errorMessage = "A network error prevented audio playback. This might be due to CORS restrictions or the file not being available.";
-              break;
-            case MediaError.MEDIA_ERR_DECODE:
-              errorMessage = "The audio file is corrupted or uses an unsupported format.";
-              break;
-            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-              errorMessage = "The audio source is not supported or could not be loaded. This might be due to CORS restrictions or an invalid URL.";
-              break;
-            default:
-              errorMessage = `An unexpected audio error occurred (Code: ${audio.error.code}).`;
-              break;
-          }
-        } else {
-          console.error("Audio playback error: No specific error object available.");
-          errorMessage = "An unknown audio error occurred. This might be due to a network issue or unsupported media.";
-        }
-        
-        toast.error(errorMessage);
-        setIsPlaying(false);
-      };
+  // Utility for shuffling an array (Fisher-Yates)
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
-  }, [volume, queue, queueIndex, repeatMode, shuffleMode, currentSong]); // Add new dependencies
+    return array;
+  };
 
   const playSong = (song: Song, newQueue?: Song[], newQueueIndex?: number) => {
     if (audioRef.current) {
@@ -275,6 +230,20 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) { // 
     playSong(queue[prevIndex], queue, prevIndex);
   };
 
+  const seekTo = (time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const setVolume = (newVolume: number) => {
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+      setVolumeState(newVolume);
+    }
+  };
+
   const toggleShuffle = () => {
     setShuffleMode(prev => {
       const newShuffleMode = !prev;
@@ -317,14 +286,59 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) { // 
     });
   };
 
-  // Utility for shuffling an array (Fisher-Yates)
-  const shuffleArray = (array: any[]) => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+
+      audioRef.current.onended = () => {
+        if (repeatMode === 'song' && currentSong) {
+          playSong(currentSong, queue, queueIndex); // Replay current song
+        } else {
+          playNextSong(); // Use the new playNextSong logic
+        }
+      };
+
+      audioRef.current.ontimeupdate = () => {
+        setCurrentTime(audioRef.current?.currentTime || 0);
+      };
+
+      audioRef.current.onloadedmetadata = () => {
+        setDuration(audioRef.current?.duration || 0);
+      };
+
+      audioRef.current.onerror = () => {
+        const audio = audioRef.current;
+        let errorMessage = "An unknown audio error occurred.";
+
+        if (audio && audio.error) {
+          console.error("Audio playback error:", audio.error);
+          switch (audio.error.code) {
+            case MediaError.MEDIA_ERR_ABORTED:
+              errorMessage = "Audio playback aborted by the user.";
+              break;
+            case MediaError.MEDIA_ERR_NETWORK:
+              errorMessage = "A network error prevented audio playback. This might be due to CORS restrictions or the file not being available.";
+              break;
+            case MediaError.MEDIA_ERR_DECODE:
+              errorMessage = "The audio file is corrupted or uses an unsupported format.";
+              break;
+            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+              errorMessage = "The audio source is not supported or could not be loaded. This might be due to CORS restrictions or an invalid URL.";
+              break;
+            default:
+              errorMessage = `An unexpected audio error occurred (Code: ${audio.error.code}).`;
+              break;
+          }
+        } else {
+          console.error("Audio playback error: No specific error object available.");
+          errorMessage = "An unknown audio error occurred. This might be due to a network issue or unsupported media.";
+        }
+        
+        toast.error(errorMessage);
+        setIsPlaying(false);
+      };
     }
-    return array;
-  };
+  }, [volume, queue, queueIndex, repeatMode, shuffleMode, currentSong, playNextSong, playSong]); // Add new dependencies
 
   return (
     <MusicPlayerContext.Provider value={{

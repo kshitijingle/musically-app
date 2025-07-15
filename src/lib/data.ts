@@ -6,11 +6,11 @@ export const mockAlbums = [
     cover: "https://picsum.photos/id/1001/300/300",
     year: 2023,
     songs: [
-      { id: "s1", title: "Whispering Pines", duration: "1:30", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { id: "s2", title: "Hidden Stream", duration: "2:49", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s3", title: "Ancient Roots", duration: "3:50", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { id: "s4", title: "Sunlit Glade", duration: "7:06", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s5", title: "Twilight Bloom", duration: "4:43", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
+      { id: "s1", title: "Whispering Pines", duration: "1:30", audioSrc: "/audio/kalimba.mp3" },
+      { id: "s2", title: "Hidden Stream", duration: "2:49", audioSrc: "/audio/sample.mp3" },
+      { id: "s3", title: "Ancient Roots", duration: "3:50", audioSrc: "/audio/kalimba.mp3" },
+      { id: "s4", title: "Sunlit Glade", duration: "7:06", audioSrc: "/audio/sample.mp3" },
+      { id: "s5", title: "Twilight Bloom", duration: "4:43", audioSrc: "/audio/kalimba.mp3" },
     ],
   },
   {
@@ -20,10 +20,10 @@ export const mockAlbums = [
     cover: "https://picsum.photos/id/1002/300/300",
     year: 2022,
     songs: [
-      { id: "s6", title: "Streetlights Glow", duration: "3:02", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s7", title: "Midnight Drive", duration: "4:20", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { id: "s8", title: "Rooftop Serenade", duration: "3:42", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s9", title: "Concrete Jungle", duration: "5:57", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
+      { id: "s6", title: "Streetlights Glow", duration: "3:02", audioSrc: "/audio/sample.mp3" },
+      { id: "s7", title: "Midnight Drive", duration: "4:20", audioSrc: "/audio/kalimba.mp3" },
+      { id: "s8", title: "Rooftop Serenade", duration: "3:42", audioSrc: "/audio/sample.mp3" },
+      { id: "s9", title: "Concrete Jungle", duration: "5:57", audioSrc: "/audio/kalimba.mp3" },
     ],
   },
   {
@@ -33,10 +33,10 @@ export const mockAlbums = [
     cover: "https://picsum.photos/id/1003/300/300",
     year: 2024,
     songs: [
-      { id: "s10", title: "Nebula Drift", duration: "2:43", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s11", title: "Galactic Pulse", duration: "4:14", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { id: "s12", title: "Astral Dance", duration: "2:14", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { id: "s13", title: "Distant Stars", duration: "3:13", audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
+      { id: "s10", title: "Nebula Drift", duration: "2:43", audioSrc: "/audio/sample.mp3" },
+      { id: "s11", title: "Galactic Pulse", duration: "4:14", audioSrc: "/audio/kalimba.mp3" },
+      { id: "s12", title: "Astral Dance", duration: "2:14", audioSrc: "/audio/sample.mp3" },
+      { id: "s13", title: "Distant Stars", duration: "3:13", audioSrc: "/audio/kalimba.mp3" },
     ],
   },
 ];
@@ -49,7 +49,7 @@ export const mockSongs = [
     album: "Deep Blue",
     duration: "3:20",
     cover: "https://picsum.photos/id/1004/300/300",
-    audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
+    audioSrc: "/audio/kalimba.mp3",
   },
   {
     id: "song2",
@@ -58,7 +58,7 @@ export const mockSongs = [
     album: "Arid Lands",
     duration: "3:53",
     cover: "https://picsum.photos/id/1005/300/300",
-    audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3",
+    audioSrc: "/audio/sample.mp3",
   },
   {
     id: "song3",
@@ -67,7 +67,7 @@ export const mockSongs = [
     album: "Summit Sounds",
     duration: "3:23",
     cover: "https://picsum.photos/id/1006/300/300",
-    audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
+    audioSrc: "/audio/kalimba.mp3",
   },
   {
     id: "song4",
@@ -76,7 +76,7 @@ export const mockSongs = [
     album: "Waterways",
     duration: "2:58",
     cover: "https://picsum.photos/id/1007/300/300",
-    audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3",
+    audioSrc: "/audio/sample.mp3",
   },
   {
     id: "song5",
@@ -85,7 +85,7 @@ export const mockSongs = [
     album: "Night Sky",
     duration: "3:51",
     cover: "https://picsum.photos/id/1008/300/300",
-    audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3",
+    audioSrc: "/audio/kalimba.mp3",
   },
 ];
 
@@ -124,9 +124,9 @@ export const mockPlaylists = [
     description: "Relaxing tunes for a peaceful start to your day.",
     cover: "https://picsum.photos/id/1014/300/300",
     songs: [
-      { ...mockSongs[0], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { ...mockSongs[2], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { ...mockSongs[4], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" }
+      { ...mockSongs[0], audioSrc: "/audio/kalimba.mp3" },
+      { ...mockSongs[2], audioSrc: "/audio/sample.mp3" },
+      { ...mockSongs[4], audioSrc: "/audio/kalimba.mp3" }
     ],
   },
   {
@@ -135,9 +135,9 @@ export const mockPlaylists = [
     description: "High-energy tracks to power your workout.",
     cover: "https://picsum.photos/id/1015/300/300",
     songs: [
-      { ...mockSongs[1], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { ...mockSongs[3], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { ...mockSongs[0], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" }
+      { ...mockSongs[1], audioSrc: "/audio/sample.mp3" },
+      { ...mockSongs[3], audioSrc: "/audio/kalimba.mp3" },
+      { ...mockSongs[0], audioSrc: "/audio/sample.mp3" }
     ],
   },
   {
@@ -146,9 +146,9 @@ export const mockPlaylists = [
     description: "Ambient and instrumental tracks for deep concentration.",
     cover: "https://picsum.photos/id/1016/300/300",
     songs: [
-      { ...mockSongs[4], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { ...mockSongs[1], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { ...mockSongs[2], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" }
+      { ...mockSongs[4], audioSrc: "/audio/kalimba.mp3" },
+      { ...mockSongs[1], audioSrc: "/audio/sample.mp3" },
+      { ...mockSongs[2], audioSrc: "/audio/kalimba.mp3" }
     ],
   },
   {
@@ -157,9 +157,9 @@ export const mockPlaylists = [
     description: "Sing along to these classics on your next adventure.",
     cover: "https://picsum.photos/id/1017/300/300",
     songs: [
-      { ...mockSongs[0], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { ...mockSongs[3], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { ...mockSongs[1], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" }
+      { ...mockSongs[0], audioSrc: "/audio/sample.mp3" },
+      { ...mockSongs[3], audioSrc: "/audio/kalimba.mp3" },
+      { ...mockSongs[1], audioSrc: "/audio/sample.mp3" }
     ],
   },
   {
@@ -168,9 +168,9 @@ export const mockPlaylists = [
     description: "Calming melodies to help you relax before bed.",
     cover: "https://picsum.photos/id/1018/300/300",
     songs: [
-      { ...mockSongs[2], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" },
-      { ...mockSongs[4], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Sample-MP3-File-Download.mp3" },
-      { ...mockSongs[0], audioSrc: "https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" }
+      { ...mockSongs[2], audioSrc: "/audio/kalimba.mp3" },
+      { ...mockSongs[4], audioSrc: "/audio/sample.mp3" },
+      { ...mockSongs[0], audioSrc: "/audio/kalimba.mp3" }
     ],
   },
 ];

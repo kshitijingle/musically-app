@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react"; // Import React to use React.use()
 import { MainLayout } from "@/components/layout/main-layout";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { PlayCircle, Clock } from "lucide-react";
@@ -9,10 +10,13 @@ import { mockAlbums } from "@/lib/data";
 import { useMusicPlayer } from "@/context/music-player-context";
 
 interface AlbumPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>; // params is now a Promise
 }
 
-export default function AlbumPage({ params }: AlbumPageProps) {
+export default function AlbumPage({ params: paramsPromise }: AlbumPageProps) {
+  // Unwrap the params promise using React.use()
+  const params = React.use(paramsPromise);
+
   const { playSong, playAlbum } = useMusicPlayer();
   const album = mockAlbums.find((a) => a.id === params.id);
 

@@ -8,19 +8,8 @@ import Image from "next/image";
 import { mockAlbums } from "@/lib/data";
 import { useMusicPlayer } from "@/context/music-player-context";
 
-// Workaround for Netlify build error: The build environment seems to be
-// incorrectly expecting `params` to be a Promise-like object.
-interface WorkaroundPageParams {
-  id: string;
-  // Properties of a Promise<any> to satisfy the type checker
-  then?: (...args: any[]) => any;
-  catch?: (...args: any[]) => any;
-  finally?: (...args: any[]) => any;
-  [Symbol.toStringTag]?: string;
-}
-
 interface AlbumPageProps {
-  params: WorkaroundPageParams;
+  params: { id: string };
 }
 
 export default function AlbumPage({ params }: AlbumPageProps) {

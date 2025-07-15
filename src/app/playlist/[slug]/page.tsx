@@ -9,6 +9,7 @@ interface PlaylistPageProps {
   params: {
     slug: string;
   };
+  searchParams?: { [key: string]: string | string[] | undefined }; // Added searchParams
 }
 
 export default function PlaylistPage({ params }: PlaylistPageProps) {

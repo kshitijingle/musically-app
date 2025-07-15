@@ -4,17 +4,17 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { PlayCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { mockPlaylists } from "@/lib/data"; // Import mockPlaylists
-import { useMusicPlayer } from "@/context/music-player-context"; // Import the hook
+import { mockPlaylists } from "@/lib/data";
+import { useMusicPlayer } from "@/context/music-player-context";
 
 interface PlaylistPageProps {
-  params: { [key: string]: string | string[] }; // Changed to be more general
+  params: { slug: string }; // Changed to specifically type slug as string
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default function PlaylistPage({ params }: PlaylistPageProps) {
-  // Safely access slug, ensuring it's a string
-  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  // Now params.slug is guaranteed to be a string
+  const slug = params.slug;
 
   const { playSong, playPlaylist } = useMusicPlayer();
   const playlist = mockPlaylists.find((p) => p.id === slug);

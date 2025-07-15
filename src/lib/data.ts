@@ -75,7 +75,7 @@ export const mockSongs = [
     artist: "Flowing Melodies",
     album: "Waterways",
     duration: "2:58",
-    cover: "https://picsum.photos/id/1007/300/300",
+    cover: "https://picsum.photos/id/1020/300/300", // Changed image ID
     audioSrc: "/audio/sample.mp3",
   },
   {

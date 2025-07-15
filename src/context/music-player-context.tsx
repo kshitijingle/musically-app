@@ -19,11 +19,13 @@ interface MusicPlayerContextType {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
+  volume: number; // Added volume state
   playSong: (song: Song) => void;
   pauseSong: () => void;
   togglePlayPause: () => void;
   playAlbum: (albumId: string) => void;
   seekTo: (time: number) => void;
+  setVolume: (volume: number) => void; // Added setVolume function
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -34,9 +36,12 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolumeState] = useState(0.75); // Initial volume at 75%
 
   useEffect(() => {
     if (audioRef.current) {
+      audioRef.current.volume = volume; // Set initial volume
+      
       audioRef.current.onended = () => {
         setIsPlaying(false);
         setCurrentTime(0);
@@ -83,7 +88,7 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
       };
     }
-  }, []);
+  }, [volume]); // Re-run effect if volume changes to update audio element
 
   const playSong = (song: Song) => {
     if (audioRef.current) {
@@ -158,8 +163,15 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setVolume = (newVolume: number) => {
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+      setVolumeState(newVolume);
+    }
+  };
+
   return (
-    <MusicPlayerContext.Provider value={{ currentSong, isPlaying, currentTime, duration, playSong, pauseSong, togglePlayPause, playAlbum, seekTo }}>
+    <MusicPlayerContext.Provider value={{ currentSong, isPlaying, currentTime, duration, volume, playSong, pauseSong, togglePlayPause, playAlbum, seekTo, setVolume }}>
       {children}
       {/* The actual audio element, hidden from view */}
       <audio ref={audioRef} preload="auto" crossOrigin="anonymous" />

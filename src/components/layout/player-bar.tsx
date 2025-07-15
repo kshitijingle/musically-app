@@ -1,6 +1,6 @@
 "use client"; // Mark as client component
 
-import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
@@ -15,12 +15,24 @@ const formatTime = (seconds: number) => {
 };
 
 export function PlayerBar() {
-  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo } = useMusicPlayer();
+  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo, volume, setVolume } = useMusicPlayer();
 
   const handleSliderChange = (value: number[]) => {
     if (duration > 0) {
       const newTime = (value[0] / 100) * duration;
       seekTo(newTime);
+    }
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0] / 100); // Convert 0-100 slider value to 0-1 volume
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setVolume(0); // Mute
+    } else {
+      setVolume(0.75); // Unmute to a default level
     }
   };
 
@@ -84,8 +96,20 @@ export function PlayerBar() {
 
       {/* Volume and Other Controls */}
       <div className="flex items-center justify-end gap-2 w-1/4">
-        <Volume2 className="h-4 w-4 text-muted-foreground" />
-        <Slider defaultValue={[50]} max={100} step={1} className="w-[100px]" />
+        <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
+          {volume === 0 ? (
+            <VolumeX className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+          )}
+        </Button>
+        <Slider
+          value={[volume * 100]} // Convert 0-1 volume to 0-100 slider value
+          max={100}
+          step={1}
+          className="w-[100px]"
+          onValueChange={handleVolumeChange}
+        />
       </div>
     </div>
   );

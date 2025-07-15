@@ -17,7 +17,7 @@ export default function Home() {
       <div className="grid gap-6">
         <Greeting />
         <p className="text-muted-foreground">
-          Explore new music and revisit your favorites.
+          Dive into your personalized soundscape, discover new tracks, and revisit your beloved classics.
         </p>
 
         <section>

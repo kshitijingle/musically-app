@@ -1,4 +1,4 @@
-"use client"; // Added this line
+"use client";
 
 import { MainLayout } from "@/components/layout/main-layout";
 import { MadeWithDyad } from "@/components/made-with-dyad";
@@ -6,7 +6,7 @@ import { PlayCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { mockAlbums } from "@/lib/data";
-import { useMusicPlayer } from "@/context/music-player-context"; // Import the hook
+import { useMusicPlayer } from "@/context/music-player-context";
 
 interface AlbumPageProps {
   params: {
@@ -15,7 +15,7 @@ interface AlbumPageProps {
 }
 
 export default function AlbumPage({ params }: AlbumPageProps) {
-  const { playSong } = useMusicPlayer();
+  const { playSong, playAlbum } = useMusicPlayer();
   const album = mockAlbums.find((a) => a.id === params.id);
 
   if (!album) {
@@ -35,18 +35,7 @@ export default function AlbumPage({ params }: AlbumPageProps) {
   }
 
   const handlePlayAlbum = () => {
-    if (album.songs.length > 0) {
-      const firstSong = album.songs[0];
-      playSong({
-        id: firstSong.id,
-        title: firstSong.title,
-        artist: album.artist,
-        album: album.title,
-        cover: album.cover,
-        duration: firstSong.duration,
-        audioSrc: firstSong.audioSrc, // Pass audioSrc
-      });
-    }
+    playAlbum(album.id);
   };
 
   return (
@@ -104,8 +93,16 @@ export default function AlbumPage({ params }: AlbumPageProps) {
                   album: album.title,
                   cover: album.cover,
                   duration: song.duration,
-                  audioSrc: song.audioSrc, // Pass audioSrc
-                })}>
+                  audioSrc: song.audioSrc,
+                }, album.songs.map(s => ({ // Pass the full album songs as the queue
+                  id: s.id,
+                  title: s.title,
+                  artist: album.artist,
+                  album: album.title,
+                  cover: album.cover,
+                  duration: s.duration,
+                  audioSrc: s.audioSrc,
+                })), i)}>
                   <td className="py-3 px-4 text-sm">{i + 1}</td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">

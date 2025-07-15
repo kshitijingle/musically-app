@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
-import { mockSongs, mockAlbums } from '@/lib/data';
+import { mockSongs, mockAlbums, mockPlaylists } from '@/lib/data'; // Import mockPlaylists
 import { toast } from 'sonner'; // Import toast for notifications
 
 interface Song {
@@ -19,13 +19,16 @@ interface MusicPlayerContextType {
   isPlaying: boolean;
   currentTime: number;
   duration: number;
-  volume: number; // Added volume state
-  playSong: (song: Song) => void;
+  volume: number;
+  playSong: (song: Song, queue?: Song[], queueIndex?: number) => void; // Modified to accept queue
   pauseSong: () => void;
   togglePlayPause: () => void;
   playAlbum: (albumId: string) => void;
+  playPlaylist: (playlistId: string) => void; // New: play entire playlist
+  playNextSong: () => void; // New
+  playPreviousSong: () => void; // New
   seekTo: (time: number) => void;
-  setVolume: (volume: number) => void; // Added setVolume function
+  setVolume: (volume: number) => void;
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
@@ -36,16 +39,24 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolumeState] = useState(0.75); // Initial volume at 75%
+  const [volume, setVolumeState] = useState(0.75);
+  const [queue, setQueue] = useState<Song[]>([]); // New: current playback queue
+  const [queueIndex, setQueueIndex] = useState<number>(-1); // New: index of current song in queue
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume; // Set initial volume
-      
+      audioRef.current.volume = volume;
+
       audioRef.current.onended = () => {
-        setIsPlaying(false);
-        setCurrentTime(0);
-        // Potentially play next song in a playlist here
+        if (queue.length > 0 && queueIndex < queue.length - 1) {
+          playSong(queue[queueIndex + 1], queue, queueIndex + 1);
+        } else {
+          setIsPlaying(false);
+          setCurrentTime(0);
+          setCurrentSong(null); // Clear current song if queue ends
+          setQueue([]); // Clear queue
+          setQueueIndex(-1); // Reset index
+        }
       };
 
       audioRef.current.ontimeupdate = () => {
@@ -61,7 +72,7 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         let errorMessage = "An unknown audio error occurred.";
 
         if (audio && audio.error) {
-          console.error("Audio playback error:", audio.error); // Log the actual error object
+          console.error("Audio playback error:", audio.error);
           switch (audio.error.code) {
             case MediaError.MEDIA_ERR_ABORTED:
               errorMessage = "Audio playback aborted by the user.";
@@ -88,29 +99,42 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
       };
     }
-  }, [volume]); // Re-run effect if volume changes to update audio element
+  }, [volume, queue, queueIndex]); // Add queue and queueIndex to dependencies
 
-  const playSong = (song: Song) => {
+  const playSong = (song: Song, newQueue?: Song[], newQueueIndex?: number) => {
     if (audioRef.current) {
-      // If it's a new song, update the source and wait for it to be ready
-      if (currentSong?.id !== song.id) {
+      // If a new queue is provided, set it
+      if (newQueue) {
+        setQueue(newQueue);
+        setQueueIndex(newQueueIndex !== undefined ? newQueueIndex : 0);
+      } else if (!newQueue && currentSong?.id !== song.id) {
+        // If playing a single song not from a queue, clear the queue
+        setQueue([song]);
+        setQueueIndex(0);
+      } else if (currentSong?.id === song.id && isPlaying) {
+        // If same song is clicked and already playing, do nothing (or pause, but current behavior is play/pause toggle)
+        return;
+      }
+
+      // Only update source if it's a different song or if it's the first play
+      if (currentSong?.id !== song.id || !audioRef.current.src) {
         audioRef.current.src = song.audioSrc;
         setCurrentSong(song);
-        // Use a promise-based approach or event listener for 'canplay'
-        const playWhenReady = () => {
-          if (audioRef.current) {
-            audioRef.current.play();
-            setIsPlaying(true);
-            console.log(`Playing: ${song.title} by ${song.artist}`);
-            audioRef.current.removeEventListener('canplay', playWhenReady); // Clean up listener
-          }
-        };
-        audioRef.current.addEventListener('canplay', playWhenReady);
         audioRef.current.load(); // Explicitly load the new source
+      }
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          setIsPlaying(true);
+          console.log(`Playing: ${song.title} by ${song.artist}`);
+        }).catch(error => {
+          console.error("Error playing audio:", error);
+          toast.error(`Failed to play ${song.title}.`);
+          setIsPlaying(false);
+        });
       } else {
-        // If it's the same song, just toggle play/pause
-        audioRef.current.play();
-        setIsPlaying(true);
+        setIsPlaying(true); // Fallback for older browsers
         console.log(`Playing: ${song.title} by ${song.artist}`);
       }
     }
@@ -139,20 +163,45 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   const playAlbum = (albumId: string) => {
     const album = mockAlbums.find(a => a.id === albumId);
     if (album && album.songs.length > 0) {
-      // For simplicity, play the first song of the album
-      const firstSong = album.songs[0];
-      const fullSongDetails: Song = {
-        id: firstSong.id,
-        title: firstSong.title,
+      const fullSongs: Song[] = album.songs.map(s => ({
+        id: s.id,
+        title: s.title,
         artist: album.artist,
         album: album.title,
         cover: album.cover,
-        duration: firstSong.duration,
-        audioSrc: firstSong.audioSrc,
-      };
-      playSong(fullSongDetails);
+        duration: s.duration,
+        audioSrc: s.audioSrc,
+      }));
+      playSong(fullSongs[0], fullSongs, 0); // Play first song of the album, set album as queue
     } else {
       console.warn(`Album with ID ${albumId} not found or has no songs.`);
+      toast.error("Album not found or has no songs.");
+    }
+  };
+
+  const playPlaylist = (playlistId: string) => {
+    const playlist = mockPlaylists.find(p => p.id === playlistId);
+    if (playlist && playlist.songs.length > 0) {
+      playSong(playlist.songs[0], playlist.songs, 0); // Play first song of the playlist, set playlist as queue
+    } else {
+      console.warn(`Playlist with ID ${playlistId} not found or has no songs.`);
+      toast.error("Playlist not found or has no songs.");
+    }
+  };
+
+  const playNextSong = () => {
+    if (queue.length > 0 && queueIndex < queue.length - 1) {
+      playSong(queue[queueIndex + 1], queue, queueIndex + 1);
+    } else {
+      toast.info("No next song in queue.");
+    }
+  };
+
+  const playPreviousSong = () => {
+    if (queue.length > 0 && queueIndex > 0) {
+      playSong(queue[queueIndex - 1], queue, queueIndex - 1);
+    } else {
+      toast.info("No previous song in queue.");
     }
   };
 
@@ -171,9 +220,8 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <MusicPlayerContext.Provider value={{ currentSong, isPlaying, currentTime, duration, volume, playSong, pauseSong, togglePlayPause, playAlbum, seekTo, setVolume }}>
+    <MusicPlayerContext.Provider value={{ currentSong, isPlaying, currentTime, duration, volume, playSong, pauseSong, togglePlayPause, playAlbum, playPlaylist, playNextSong, playPreviousSong, seekTo, setVolume }}>
       {children}
-      {/* The actual audio element, hidden from view */}
       <audio ref={audioRef} preload="auto" crossOrigin="anonymous" />
     </MusicPlayerContext.Provider>
   );

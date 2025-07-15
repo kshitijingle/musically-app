@@ -15,7 +15,7 @@ const formatTime = (seconds: number) => {
 };
 
 export function PlayerBar() {
-  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo, volume, setVolume } = useMusicPlayer();
+  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo, volume, setVolume, playNextSong, playPreviousSong } = useMusicPlayer();
 
   const handleSliderChange = (value: number[]) => {
     if (duration > 0) {
@@ -57,7 +57,7 @@ export function PlayerBar() {
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <Shuffle className="h-4 w-4 text-muted-foreground" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={playPreviousSong} disabled={!currentSong}>
             <SkipBack className="h-4 w-4" />
           </Button>
           <Button
@@ -73,7 +73,7 @@ export function PlayerBar() {
               <Play className="h-5 w-5 fill-current" />
             )}
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={playNextSong} disabled={!currentSong}>
             <SkipForward className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8">

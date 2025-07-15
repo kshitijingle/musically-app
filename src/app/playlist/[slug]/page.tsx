@@ -16,7 +16,7 @@ export default function PlaylistPage({ params }: PlaylistPageProps) {
   // Safely access slug, ensuring it's a string
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
 
-  const { playSong } = useMusicPlayer();
+  const { playSong, playPlaylist } = useMusicPlayer();
   const playlist = mockPlaylists.find((p) => p.id === slug);
 
   if (!playlist) {
@@ -36,9 +36,7 @@ export default function PlaylistPage({ params }: PlaylistPageProps) {
   }
 
   const handlePlayPlaylist = () => {
-    if (playlist.songs.length > 0) {
-      playSong(playlist.songs[0]); // Play the first song of the playlist
-    }
+    playPlaylist(playlist.id);
   };
 
   // Calculate total duration of the playlist
@@ -91,7 +89,7 @@ export default function PlaylistPage({ params }: PlaylistPageProps) {
             </thead>
             <tbody>
               {playlist.songs.map((song, i) => (
-                <tr key={song.id} className="border-b border-border/50 hover:bg-muted/50 cursor-pointer" onClick={() => playSong(song)}>
+                <tr key={song.id} className="border-b border-border/50 hover:bg-muted/50 cursor-pointer" onClick={() => playSong(song, playlist.songs, i)}>
                   <td className="py-3 px-4 text-sm">{i + 1}</td>
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">

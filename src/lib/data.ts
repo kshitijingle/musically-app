@@ -155,7 +155,7 @@ export const mockPlaylists = [
     id: "playlist4",
     name: "Road Trip Jams",
     description: "Sing along to these classics on your next adventure.",
-    cover: "https://picsum.photos/id/1017/300/300",
+    cover: "https://picsum.photos/id/1025/300/300", // Changed to a new ID
     songs: [
       { ...mockSongs[0], audioSrc: "/audio/flow-211881.mp3" },
       { ...mockSongs[3], audioSrc: "/audio/nightfall-future-bass-music-228100.mp3" },

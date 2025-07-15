@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**', // This allows images from any HTTPS hostname. Be cautious in production.
+      },
+    ],
+  },
 };
 
 export default nextConfig;

@@ -51,28 +51,36 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         setDuration(audioRef.current?.duration || 0);
       };
 
-      audioRef.current.onerror = (e) => {
-        console.error("Audio playback error:", e);
-        let errorMessage = "An unknown audio error occurred.";
+      audioRef.current.onerror = () => {
         const audio = audioRef.current;
-        if (audio) {
-          switch (audio.error?.code) {
-            case audio.error?.MEDIA_ERR_ABORTED:
-              errorMessage = "Audio playback aborted.";
+        let errorMessage = "An unknown audio error occurred.";
+
+        if (audio && audio.error) {
+          console.error("Audio playback error:", audio.error); // Log the actual error object
+          switch (audio.error.code) {
+            case MediaError.MEDIA_ERR_ABORTED:
+              errorMessage = "Audio playback aborted by the user.";
               break;
-            case audio.error?.MEDIA_ERR_NETWORK:
+            case MediaError.MEDIA_ERR_NETWORK:
               errorMessage = "A network error prevented audio playback. This might be due to CORS restrictions or the file not being available.";
               break;
-            case audio.error?.MEDIA_ERR_DECODE:
+            case MediaError.MEDIA_ERR_DECODE:
               errorMessage = "The audio file is corrupted or uses an unsupported format.";
               break;
-            case audio.error?.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
               errorMessage = "The audio source is not supported or could not be loaded. This might be due to CORS restrictions or an invalid URL.";
               break;
+            default:
+              errorMessage = `An unexpected audio error occurred (Code: ${audio.error.code}).`;
+              break;
           }
+        } else {
+          console.error("Audio playback error: No specific error object available.");
+          errorMessage = "An unknown audio error occurred. This might be due to a network issue or unsupported media.";
         }
-        toast.error(errorMessage); // Show toast notification
-        setIsPlaying(false); // Stop playing on error
+        
+        toast.error(errorMessage);
+        setIsPlaying(false);
       };
     }
   }, []);

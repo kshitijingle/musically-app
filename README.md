@@ -20,8 +20,7 @@ Experience the app live: [https://musicallyapp.netlify.app/](https://musicallyap
 *   **Responsive Layout:** Optimized for both desktop and mobile devices using `react-resizable-panels`.
 *   **Toast Notifications:** Informative pop-up messages for user actions (e.g., "Now playing").
 
-![Uploading {7F7E9F38-EF1E-4533-BA4D-D4CE26728042}.png…]()
-
+<img width="2915" height="1891" alt="{7F7E9F38-EF1E-4533-BA4D-D4CE26728042}" src="https://github.com/user-attachments/assets/3a7c1f04-02cc-4798-91a0-f05a5066457b" />
 
 ## 🛠️ Tech Stack
 

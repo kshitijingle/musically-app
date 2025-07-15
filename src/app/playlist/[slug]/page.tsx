@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { mockPlaylists } from "@/lib/data";
 import { useMusicPlayer } from "@/context/music-player-context";
 
+// This comment is added to help trigger a re-evaluation of TypeScript types.
 interface PlaylistPageProps {
   params: { slug: string }; // Changed to specifically type slug as string
   searchParams: { [key: string]: string | string[] | undefined };

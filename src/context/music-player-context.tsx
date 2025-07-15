@@ -29,33 +29,36 @@ interface MusicPlayerContextType {
   playPreviousSong: () => void; // New
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
+  shuffleMode: boolean; // New
+  repeatMode: 'off' | 'song' | 'queue'; // New
+  toggleShuffle: () => void; // New
+  toggleRepeat: () => void; // New
 }
 
 const MusicPlayerContext = createContext<MusicPlayerContextType | undefined>(undefined);
 
-export function MusicPlayerProvider({ children }: { children: ReactNode }) {
+export function MusicPlayerProvider({ children }: { children: ReactNode }) { // Corrected this line
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.75);
-  const [queue, setQueue] = useState<Song[]>([]); // New: current playback queue
+  const [queue, setQueue] = useState<Song[]>([]); // New: current playback queue (can be shuffled)
   const [queueIndex, setQueueIndex] = useState<number>(-1); // New: index of current song in queue
+  const [originalQueue, setOriginalQueue] = useState<Song[]>([]); // New: Store the original, unshuffled queue
+  const [shuffleMode, setShuffleMode] = useState(false); // New
+  const [repeatMode, setRepeatMode] = useState<'off' | 'song' | 'queue'>('off'); // New
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
 
       audioRef.current.onended = () => {
-        if (queue.length > 0 && queueIndex < queue.length - 1) {
-          playSong(queue[queueIndex + 1], queue, queueIndex + 1);
+        if (repeatMode === 'song' && currentSong) {
+          playSong(currentSong, queue, queueIndex); // Replay current song
         } else {
-          setIsPlaying(false);
-          setCurrentTime(0);
-          setCurrentSong(null); // Clear current song if queue ends
-          setQueue([]); // Clear queue
-          setQueueIndex(-1); // Reset index
+          playNextSong(); // Use the new playNextSong logic
         }
       };
 
@@ -99,20 +102,29 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         setIsPlaying(false);
       };
     }
-  }, [volume, queue, queueIndex]); // Add queue and queueIndex to dependencies
+  }, [volume, queue, queueIndex, repeatMode, shuffleMode, currentSong]); // Add new dependencies
 
   const playSong = (song: Song, newQueue?: Song[], newQueueIndex?: number) => {
     if (audioRef.current) {
-      // If a new queue is provided, set it
+      // If a new queue is provided, set it as original and potentially shuffle
       if (newQueue) {
-        setQueue(newQueue);
-        setQueueIndex(newQueueIndex !== undefined ? newQueueIndex : 0);
+        setOriginalQueue(newQueue);
+        if (shuffleMode) {
+          const shuffled = shuffleArray([...newQueue]);
+          setQueue(shuffled);
+          const newIndex = shuffled.findIndex(s => s.id === song.id);
+          setQueueIndex(newIndex !== -1 ? newIndex : 0);
+        } else {
+          setQueue(newQueue);
+          setQueueIndex(newQueueIndex !== undefined ? newQueueIndex : 0);
+        }
       } else if (!newQueue && currentSong?.id !== song.id) {
-        // If playing a single song not from a queue, clear the queue
+        // If playing a single song not from a queue, clear the queue and set this as the original
+        setOriginalQueue([song]);
         setQueue([song]);
         setQueueIndex(0);
       } else if (currentSong?.id === song.id && isPlaying) {
-        // If same song is clicked and already playing, do nothing (or pause, but current behavior is play/pause toggle)
+        // If same song is clicked and already playing, do nothing
         return;
       }
 
@@ -127,7 +139,7 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
       if (playPromise !== undefined) {
         playPromise.then(() => {
           setIsPlaying(true);
-          console.log(`Playing: ${song.title} by ${song.artist}`);
+          toast.success(`Now playing: ${song.title}`);
         }).catch(error => {
           console.error("Error playing audio:", error);
           toast.error(`Failed to play ${song.title}.`);
@@ -135,7 +147,7 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
         });
       } else {
         setIsPlaying(true); // Fallback for older browsers
-        console.log(`Playing: ${song.title} by ${song.artist}`);
+        toast.success(`Now playing: ${song.title}`);
       }
     }
   };
@@ -190,37 +202,137 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
   };
 
   const playNextSong = () => {
-    if (queue.length > 0 && queueIndex < queue.length - 1) {
-      playSong(queue[queueIndex + 1], queue, queueIndex + 1);
-    } else {
-      toast.info("No next song in queue.");
+    if (queue.length === 0) {
+      toast.info("No songs in queue.");
+      return;
     }
+
+    if (repeatMode === 'song' && currentSong) {
+      playSong(currentSong, queue, queueIndex); // Replay current song
+      return;
+    }
+
+    let nextIndex = queueIndex + 1;
+    if (shuffleMode) {
+      // Pick a random song from the original queue that is not the current one
+      const availableSongs = originalQueue.filter(s => s.id !== currentSong?.id);
+      if (availableSongs.length > 0) {
+        const randomSong = availableSongs[Math.floor(Math.random() * availableSongs.length)];
+        const newIndexInQueue = queue.findIndex(s => s.id === randomSong.id);
+        if (newIndexInQueue !== -1) {
+          playSong(randomSong, queue, newIndexInQueue);
+        } else {
+          // Fallback if random song not found in current queue (shouldn't happen if queue is shuffled original)
+          toast.info("Could not find a random next song.");
+        }
+      } else {
+        // If only one song or no other songs to shuffle to, just end or repeat if queue repeat is on
+        if (repeatMode === 'queue') {
+          playSong(queue[0], queue, 0); // Loop back to start
+        } else {
+          setIsPlaying(false);
+          setCurrentTime(0);
+          setCurrentSong(null);
+          setQueue([]);
+          setQueueIndex(-1);
+          toast.info("Queue ended.");
+        }
+      }
+      return;
+    }
+
+    if (nextIndex >= queue.length) {
+      if (repeatMode === 'queue') {
+        nextIndex = 0; // Loop back to start of queue
+      } else {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setCurrentSong(null);
+        setQueue([]);
+        setQueueIndex(-1);
+        toast.info("Queue ended.");
+        return;
+      }
+    }
+    playSong(queue[nextIndex], queue, nextIndex);
   };
 
   const playPreviousSong = () => {
-    if (queue.length > 0 && queueIndex > 0) {
-      playSong(queue[queueIndex - 1], queue, queueIndex - 1);
-    } else {
-      toast.info("No previous song in queue.");
+    if (queue.length === 0) {
+      toast.info("No songs in queue.");
+      return;
     }
+
+    let prevIndex = queueIndex - 1;
+    if (prevIndex < 0) {
+      if (repeatMode === 'queue') {
+        prevIndex = queue.length - 1; // Loop back to end of queue
+      } else {
+        toast.info("No previous song in queue.");
+        return;
+      }
+    }
+    playSong(queue[prevIndex], queue, prevIndex);
   };
 
-  const seekTo = (time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
+  const toggleShuffle = () => {
+    setShuffleMode(prev => {
+      const newShuffleMode = !prev;
+      if (newShuffleMode) {
+        // If turning shuffle ON, shuffle the original queue and set it as the active queue
+        if (originalQueue.length > 0) {
+          const shuffled = shuffleArray([...originalQueue]);
+          setQueue(shuffled);
+          // Find the current song's index in the new shuffled queue
+          const currentSongId = currentSong?.id;
+          const newIndex = currentSongId ? shuffled.findIndex(s => s.id === currentSongId) : 0;
+          setQueueIndex(newIndex !== -1 ? newIndex : 0);
+        }
+        toast.info("Shuffle ON");
+      } else {
+        // If turning shuffle OFF, revert to the original queue
+        setQueue(originalQueue);
+        // Find the current song's index in the original queue
+        const currentSongId = currentSong?.id;
+        const newIndex = currentSongId ? originalQueue.findIndex(s => s.id === currentSongId) : 0;
+        setQueueIndex(newIndex !== -1 ? newIndex : 0);
+        toast.info("Shuffle OFF");
+      }
+      return newShuffleMode;
+    });
   };
 
-  const setVolume = (newVolume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-      setVolumeState(newVolume);
+  const toggleRepeat = () => {
+    setRepeatMode(prev => {
+      if (prev === 'off') {
+        toast.info("Repeat Song");
+        return 'song';
+      } else if (prev === 'song') {
+        toast.info("Repeat Queue");
+        return 'queue';
+      } else {
+        toast.info("Repeat Off");
+        return 'off';
+      }
+    });
+  };
+
+  // Utility for shuffling an array (Fisher-Yates)
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
   };
 
   return (
-    <MusicPlayerContext.Provider value={{ currentSong, isPlaying, currentTime, duration, volume, playSong, pauseSong, togglePlayPause, playAlbum, playPlaylist, playNextSong, playPreviousSong, seekTo, setVolume }}>
+    <MusicPlayerContext.Provider value={{
+      currentSong, isPlaying, currentTime, duration, volume,
+      playSong, pauseSong, togglePlayPause, playAlbum, playPlaylist,
+      playNextSong, playPreviousSong, seekTo, setVolume,
+      shuffleMode, repeatMode, toggleShuffle, toggleRepeat
+    }}>
       {children}
       <audio ref={audioRef} preload="auto" crossOrigin="anonymous" />
     </MusicPlayerContext.Provider>

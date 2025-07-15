@@ -1,10 +1,11 @@
 "use client"; // Mark as client component
 
-import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, VolumeX } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, Volume2, Shuffle, Repeat, VolumeX, Repeat1 } from "lucide-react"; // Import Repeat1 icon
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { useMusicPlayer } from "@/context/music-player-context"; // Import the hook
+import { cn } from "@/lib/utils"; // Import cn for conditional class names
 
 // Helper function to format time from seconds to MM:SS
 const formatTime = (seconds: number) => {
@@ -15,7 +16,11 @@ const formatTime = (seconds: number) => {
 };
 
 export function PlayerBar() {
-  const { currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo, volume, setVolume, playNextSong, playPreviousSong } = useMusicPlayer();
+  const {
+    currentSong, isPlaying, togglePlayPause, currentTime, duration, seekTo, volume, setVolume,
+    playNextSong, playPreviousSong,
+    shuffleMode, repeatMode, toggleShuffle, toggleRepeat
+  } = useMusicPlayer();
 
   const handleSliderChange = (value: number[]) => {
     if (duration > 0) {
@@ -54,8 +59,13 @@ export function PlayerBar() {
       {/* Controls */}
       <div className="flex flex-col items-center gap-2 w-1/2">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Shuffle className="h-4 w-4 text-muted-foreground" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("h-8 w-8", shuffleMode && "text-primary")} // Highlight if active
+            onClick={toggleShuffle}
+          >
+            <Shuffle className="h-4 w-4" />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={playPreviousSong} disabled={!currentSong}>
             <SkipBack className="h-4 w-4" />
@@ -76,8 +86,17 @@ export function PlayerBar() {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={playNextSong} disabled={!currentSong}>
             <SkipForward className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Repeat className="h-4 w-4 text-muted-foreground" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("h-8 w-8", repeatMode !== 'off' && "text-primary")} // Highlight if active
+            onClick={toggleRepeat}
+          >
+            {repeatMode === 'song' ? (
+              <Repeat1 className="h-4 w-4" />
+            ) : (
+              <Repeat className="h-4 w-4" />
+            )}
           </Button>
         </div>
         <div className="flex items-center w-full gap-2 text-xs text-muted-foreground">

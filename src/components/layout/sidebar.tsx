@@ -3,6 +3,7 @@ import { Home, Search, Library, Plus, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { mockPlaylists } from "@/lib/data"; // Import mockPlaylists
 
 export function Sidebar() {
   const navItems = [
@@ -14,24 +15,6 @@ export function Sidebar() {
   const playlistItems = [
     { name: "Create Playlist", icon: Plus, href: "/create-playlist" },
     { name: "Liked Songs", icon: Heart, href: "/liked-songs" },
-  ];
-
-  const playlists = [
-    "My Top Songs",
-    "Workout Mix",
-    "Chill Vibes",
-    "Focus Music",
-    "Road Trip Anthems",
-    "Morning Coffee",
-    "Evening Jazz",
-    "Party Hits",
-    "Acoustic Covers",
-    "Instrumental Study",
-    "Classical Masterpieces",
-    "Electronic Beats",
-    "Indie Discoveries",
-    "Pop Essentials",
-    "Rock Classics",
   ];
 
   return (
@@ -72,13 +55,13 @@ export function Sidebar() {
         <h3 className="px-4 py-2 text-sm font-semibold text-sidebar-foreground">Your Playlists</h3>
         <ScrollArea className="h-[calc(100%-40px)] px-2 pb-4">
           <div className="flex flex-col gap-1">
-            {playlists.map((playlist, index) => (
-              <Link key={index} href={`/playlist/${playlist.toLowerCase().replace(/\s/g, '-')}`}>
+            {mockPlaylists.map((playlist) => ( // Use mockPlaylists here
+              <Link key={playlist.id} href={`/playlist/${playlist.id}`}> {/* Link to dynamic playlist page */}
                 <Button
                   variant="ghost"
                   className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
                 >
-                  {playlist}
+                  {playlist.name}
                 </Button>
               </Link>
             ))}

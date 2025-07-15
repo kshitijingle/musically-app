@@ -213,3 +213,41 @@ export const mockArtists = [
     image: "/images/justin-bieber.jpg",
   },
 ];
+
+export const mockPlaylists = [
+  {
+    id: "playlist1",
+    name: "My Top Songs",
+    description: "A collection of my all-time favorite tracks.",
+    cover: "/images/playlist-cover-1.jpg", // Placeholder image
+    songs: [mockSongs[0], mockSongs[2], mockSongs[4], mockSongs[6]],
+  },
+  {
+    id: "playlist2",
+    name: "Workout Mix",
+    description: "High-energy tracks to power your workout.",
+    cover: "/images/playlist-cover-2.jpg", // Placeholder image
+    songs: [mockSongs[1], mockSongs[3], mockSongs[5], mockSongs[7]],
+  },
+  {
+    id: "playlist3",
+    name: "Chill Vibes",
+    description: "Relaxing tunes for unwinding and chilling out.",
+    cover: "/images/playlist-cover-3.jpg", // Placeholder image
+    songs: [mockSongs[8], mockSongs[9], mockSongs[0], mockSongs[1]],
+  },
+  {
+    id: "playlist4",
+    name: "Focus Music",
+    description: "Instrumental and ambient tracks for concentration.",
+    cover: "/images/playlist-cover-4.jpg", // Placeholder image
+    songs: [mockSongs[2], mockSongs[4], mockSongs[6], mockSongs[8]],
+  },
+  {
+    id: "playlist5",
+    name: "Road Trip Anthems",
+    description: "Sing along to these classics on your next adventure.",
+    cover: "/images/playlist-cover-5.jpg", // Placeholder image
+    songs: [mockSongs[3], mockSongs[5], mockSongs[7], mockSongs[9]],
+  },
+];

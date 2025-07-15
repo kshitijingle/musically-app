@@ -8,14 +8,16 @@ import { mockPlaylists } from "@/lib/data"; // Import mockPlaylists
 import { useMusicPlayer } from "@/context/music-player-context"; // Import the hook
 
 interface PlaylistPageProps {
-  params: {
-    slug: string;
-  };
+  params: { [key: string]: string | string[] }; // Changed to be more general
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export default function PlaylistPage({ params }: PlaylistPageProps) {
+  // Safely access slug, ensuring it's a string
+  const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+
   const { playSong } = useMusicPlayer();
-  const playlist = mockPlaylists.find((p) => p.id === params.slug);
+  const playlist = mockPlaylists.find((p) => p.id === slug);
 
   if (!playlist) {
     return (

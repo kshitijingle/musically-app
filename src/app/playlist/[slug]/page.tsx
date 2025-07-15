@@ -7,7 +7,22 @@ import { Button } from "@/components/ui/button";
 import { mockPlaylists } from "@/lib/data";
 import { useMusicPlayer } from "@/context/music-player-context";
 
-export default function PlaylistPage({ params }: { params: { slug: string } }) {
+// Workaround for Netlify build error: The build environment seems to be
+// incorrectly expecting `params` to be a Promise-like object.
+interface WorkaroundPageParams {
+  slug: string;
+  // Properties of a Promise<any> to satisfy the type checker
+  then?: (...args: any[]) => any;
+  catch?: (...args: any[]) => any;
+  finally?: (...args: any[]) => any;
+  [Symbol.toStringTag]?: string;
+}
+
+interface PlaylistPageProps {
+  params: WorkaroundPageParams;
+}
+
+export default function PlaylistPage({ params }: PlaylistPageProps) {
   // Now params.slug is guaranteed to be a string
   const slug = params.slug;
 

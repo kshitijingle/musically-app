@@ -8,14 +8,7 @@ import Image from "next/image";
 import { mockAlbums } from "@/lib/data";
 import { useMusicPlayer } from "@/context/music-player-context";
 
-// This comment is added to help trigger a re-evaluation of TypeScript types for the album page.
-interface AlbumPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function AlbumPage({ params }: AlbumPageProps) {
+export default function AlbumPage({ params }: { params: { id: string } }) {
   const { playSong, playAlbum } = useMusicPlayer();
   const album = mockAlbums.find((a) => a.id === params.id);
 

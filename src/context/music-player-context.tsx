@@ -79,14 +79,27 @@ export function MusicPlayerProvider({ children }: { children: ReactNode }) {
 
   const playSong = (song: Song) => {
     if (audioRef.current) {
+      // If it's a new song, update the source and wait for it to be ready
       if (currentSong?.id !== song.id) {
         audioRef.current.src = song.audioSrc;
         setCurrentSong(song);
-        audioRef.current.load(); // Load the new source
+        // Use a promise-based approach or event listener for 'canplay'
+        const playWhenReady = () => {
+          if (audioRef.current) {
+            audioRef.current.play();
+            setIsPlaying(true);
+            console.log(`Playing: ${song.title} by ${song.artist}`);
+            audioRef.current.removeEventListener('canplay', playWhenReady); // Clean up listener
+          }
+        };
+        audioRef.current.addEventListener('canplay', playWhenReady);
+        audioRef.current.load(); // Explicitly load the new source
+      } else {
+        // If it's the same song, just toggle play/pause
+        audioRef.current.play();
+        setIsPlaying(true);
+        console.log(`Playing: ${song.title} by ${song.artist}`);
       }
-      audioRef.current.play();
-      setIsPlaying(true);
-      console.log(`Playing: ${song.title} by ${song.artist}`);
     }
   };
 
